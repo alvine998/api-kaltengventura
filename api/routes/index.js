@@ -1,23 +1,23 @@
-// const { middlewareHere } = require('../middleware/index.js');
+const { middlewareHere } = require('../middleware/index.js');
 
 module.exports = (app) => {
     const cUser = require('../controllers/user.js');
-    // const customers = require('../controllers/customer.js');
+    const cBank = require('../controllers/bank.js');
     // const categories = require('../controllers/category.js');
     // const apps = require('../controllers/app.js');
     // const stocks = require('../controllers/stock.js');
     // const prices = require('../controllers/price.js');
 
-    app.get('/users', cUser.list);
-    app.post('/user', cUser.create);
-    app.post('/user/auth', cUser.login);
-    app.patch('/user', cUser.update);
-    app.delete('/user', cUser.delete);
+    app.get('/user/list', middlewareHere, cUser.list);
+    app.post('/user', middlewareHere, cUser.create);
+    app.post('/user/auth', middlewareHere, cUser.login);
+    app.patch('/user', middlewareHere, cUser.update);
+    app.delete('/user', middlewareHere, cUser.delete);
 
-    // app.get('/customers', middlewareHere, customers.list);
-    // app.post('/customer', middlewareHere, customers.create);
-    // app.patch('/customer', middlewareHere, customers.update);
-    // app.delete('/customer', middlewareHere, customers.delete);
+    app.get('/bank/list', middlewareHere, cBank.list);
+    app.post('/bank', middlewareHere, cBank.create);
+    app.patch('/bank', middlewareHere, cBank.update);
+    app.delete('/bank', middlewareHere, cBank.delete);
 
     // app.get('/apps', middlewareHere, apps.list);
     // app.post('/app', middlewareHere, apps.create);
