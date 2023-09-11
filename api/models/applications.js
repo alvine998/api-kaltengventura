@@ -1,35 +1,55 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+  return sequelize.define('applications', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    name: {
+    contract_no: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: "if approved it filled"
+    },
+    debtor_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    debtor_name: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    photo: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    phone: {
-      type: DataTypes.STRING(13),
+    user_id: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
-    email: {
+    user_name: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    password: {
-      type: DataTypes.STRING(100),
+    loan: {
+      type: DataTypes.DOUBLE,
       allowNull: false
+    },
+    year: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    installment: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      comment: "per month"
     },
     status: {
-      type: DataTypes.ENUM('active','nonactive'),
-      allowNull: false
+      type: DataTypes.ENUM('approved','rejected','waiting'),
+      allowNull: false,
+      defaultValue: "waiting"
+    },
+    approved_by: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      comment: "{ admin_name, admin_id, approved_on}"
     },
     created_on: {
       type: DataTypes.DATE,
@@ -43,11 +63,12 @@ module.exports = function(sequelize, DataTypes) {
     deleted: {
       type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 0,
+      comment: "0"
     }
   }, {
     sequelize,
-    tableName: 'users',
+    tableName: 'applications',
     timestamps: false,
     indexes: [
       {

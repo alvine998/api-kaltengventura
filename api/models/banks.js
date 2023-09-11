@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+  return sequelize.define('banks', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -11,19 +11,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    photo: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    phone: {
-      type: DataTypes.STRING(13),
+    account_number: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
-    email: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
-    password: {
+    account_name: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
@@ -47,7 +39,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'users',
+    tableName: 'banks',
     timestamps: false,
     indexes: [
       {

@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+  return sequelize.define('debtors', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -11,25 +11,48 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    photo: {
-      type: DataTypes.TEXT,
+    address: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    field_type: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    place_status: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    other_loan: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+      defaultValue: 0
+    },
+    other_loan_name: {
+      type: DataTypes.STRING(100),
       allowNull: true
     },
-    phone: {
-      type: DataTypes.STRING(13),
-      allowNull: false
-    },
-    email: {
+    mother_name: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    password: {
-      type: DataTypes.STRING(100),
+    ktp: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    kk: {
+      type: DataTypes.TEXT,
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('active','nonactive'),
-      allowNull: false
+      type: DataTypes.ENUM('approved','rejected','waiting'),
+      allowNull: false,
+      defaultValue: "waiting"
+    },
+    approved_by: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      comment: "{ admin_name, admin_id, approved_on}"
     },
     created_on: {
       type: DataTypes.DATE,
@@ -47,7 +70,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'users',
+    tableName: 'debtors',
     timestamps: false,
     indexes: [
       {
