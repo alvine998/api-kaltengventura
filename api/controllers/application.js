@@ -2,6 +2,7 @@
 const { generateRandomString } = require('../../utils')
 const db = require('../models')
 const applications = db.applications
+const payments = db.payments
 const debtors = db.debtors
 const users = db.users
 const Op = db.Sequelize.Op
@@ -160,10 +161,28 @@ exports.approval = async (req, res) => {
                 id: { [Op.eq]: req.body.id }
             }
         })
-        res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
+        if (req.body.status == "approved") {
+            const payload = {
+                application_id: result?.id,
+                application_name: result?.debtor_name,
+                application_contract: result?.contract_no,
+                fee: result?.installment,
+                payment_rate: 0,
+                payment_fee: 0,
+                payment_date: null,
+                total_payment: result?.installment,
+                status: 'unpaid'
+            };
+            let dates = new Date();
+            for (let index = 0; index < result?.year; index++) {
+                dates.setDate(dates.getDate() + 30);
+                await payments.create({ ...payload, due_date: dates })
+            }
+        }
+        res.status(200).send({ message: "Berhasil ubah status", update: onUpdate })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal ubah data", error: error })
+        return res.status(500).send({ message: "Gagal ubah status", error: error })
     }
 }
 

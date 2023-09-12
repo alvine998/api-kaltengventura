@@ -23,6 +23,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DOUBLE,
       allowNull: false
     },
+    due_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
     payment_rate: {
       type: DataTypes.INTEGER,
       allowNull: true,
