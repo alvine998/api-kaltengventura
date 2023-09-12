@@ -1,6 +1,8 @@
 
 const db = require('../models')
-const banks = db.banks
+const applications = db.applications
+const debtors = db.debtors
+const users = db.users
 const Op = db.Sequelize.Op
 require('dotenv').config()
 
@@ -8,16 +10,18 @@ require('dotenv').config()
 exports.list = async (req, res) => {
     try {
         const size = req.query.size || 10;
-        const result = await banks.findAll({
+        const result = await applications.findAll({
             where: {
                 deleted: { [Op.eq]: 0 },
                 ...req.query.search && {
                     [Op.or]: [
-                        { account_name: { [Op.like]: `%${req.query.search}%` } },
-                        { account_number: { [Op.like]: `%${req.query.search}%` } },
+                        { contract_no: { [Op.like]: `%${req.query.search}%` } },
                     ]
                 },
                 ...req.query.id && { id: { [Op.eq]: req.query.id } },
+                ...req.query.status && { status: { [Op.eq]: req.query.status } },
+                ...req.query.debtor_id && { debtor_id: { [Op.eq]: req.query.debtor_id } },
+                ...req.query.user_id && { user_id: { [Op.eq]: req.query.user_id } },
             },
             order: [
                 ['created_on', 'DESC'],
@@ -37,7 +41,7 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        let requiredAttributes = ['name', 'account_name', 'account_number', 'status']
+        let requiredAttributes = ['user_id', 'user_name', 'debtor_id', 'debtor_name', 'loan', 'year', 'installment']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
@@ -49,24 +53,38 @@ exports.create = async (req, res) => {
                 })
             }
         }
-        const existing = await banks.findOne({
+        const existUser = await users.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
-                account_number: { [Op.eq]: req.body.account_number }
+                id: { [Op.eq]: req.body.user_id }
             }
         })
-        if (existing) {
+        if (!existUser) {
             return res.status(400).send({
                 status: "error",
                 items: "",
-                error_message: "No Kartu telah terdaftar!",
+                error_message: "Data user tidak ditemukan!",
+                code: 400
+            })
+        }
+        const existDebt = await debtors.findOne({
+            where: {
+                deleted: { [Op.eq]: 0 },
+                id: { [Op.eq]: req.body.debtor_id }
+            }
+        })
+        if (!existDebt) {
+            return res.status(400).send({
+                status: "error",
+                items: "",
+                error_message: "Data debtor tidak ditemukan!",
                 code: 400
             })
         }
         const payload = {
             ...req.body,
         };
-        const result = await banks.create(payload)
+        const result = await applications.create(payload)
         return res.status(200).send({
             status: "success",
             items: result,
@@ -81,7 +99,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const result = await banks.findOne({
+        const result = await applications.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
@@ -93,13 +111,13 @@ exports.update = async (req, res) => {
         const payload = {
             ...req.body,
         }
-        const onUpdate = await banks.update(payload, {
+        const onUpdate = await applications.update(payload, {
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
             }
         })
-        const results = await banks.findOne({
+        const results = await applications.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
@@ -114,7 +132,7 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        const result = await banks.findOne({
+        const result = await applications.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.query.id }

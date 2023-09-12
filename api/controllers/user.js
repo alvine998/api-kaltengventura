@@ -43,14 +43,14 @@ exports.list = async (req, res) => {
 exports.create = async (req, res) => {
     try {
         const { phone } = req.body
-        let requiredAttributes = ['name', 'phone', 'email', 'address', 'status', 'password']
+        let requiredAttributes = ['name', 'phone', 'email', 'status', 'password']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
                 return res.status(400).send({
                     status: "error",
                     items: "",
-                    error_message: "Parameter tidak lengkap!",
+                    error_message: "Parameter tidak lengkap! " + element,
                     code: 400
                 })
             }

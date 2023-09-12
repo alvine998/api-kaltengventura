@@ -1,6 +1,6 @@
 
 const db = require('../models')
-const banks = db.banks
+const debtors = db.debtors
 const Op = db.Sequelize.Op
 require('dotenv').config()
 
@@ -8,16 +8,16 @@ require('dotenv').config()
 exports.list = async (req, res) => {
     try {
         const size = req.query.size || 10;
-        const result = await banks.findAll({
+        const result = await debtors.findAll({
             where: {
                 deleted: { [Op.eq]: 0 },
                 ...req.query.search && {
                     [Op.or]: [
-                        { account_name: { [Op.like]: `%${req.query.search}%` } },
-                        { account_number: { [Op.like]: `%${req.query.search}%` } },
+                        { name: { [Op.like]: `%${req.query.search}%` } },
                     ]
                 },
                 ...req.query.id && { id: { [Op.eq]: req.query.id } },
+                ...req.query.status && { status: { [Op.eq]: req.query.status } }
             },
             order: [
                 ['created_on', 'DESC'],
@@ -37,7 +37,7 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        let requiredAttributes = ['name', 'account_name', 'account_number', 'status']
+        let requiredAttributes = ['name', 'address', 'field_type', 'place_status', 'mother_name', 'ktp', 'kk']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
@@ -49,24 +49,10 @@ exports.create = async (req, res) => {
                 })
             }
         }
-        const existing = await banks.findOne({
-            where: {
-                deleted: { [Op.eq]: 0 },
-                account_number: { [Op.eq]: req.body.account_number }
-            }
-        })
-        if (existing) {
-            return res.status(400).send({
-                status: "error",
-                items: "",
-                error_message: "No Kartu telah terdaftar!",
-                code: 400
-            })
-        }
         const payload = {
             ...req.body,
         };
-        const result = await banks.create(payload)
+        const result = await debtors.create(payload)
         return res.status(200).send({
             status: "success",
             items: result,
@@ -81,7 +67,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const result = await banks.findOne({
+        const result = await debtors.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
@@ -93,13 +79,13 @@ exports.update = async (req, res) => {
         const payload = {
             ...req.body,
         }
-        const onUpdate = await banks.update(payload, {
+        const onUpdate = await debtors.update(payload, {
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
             }
         })
-        const results = await banks.findOne({
+        const results = await debtors.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.body.id }
@@ -114,7 +100,7 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        const result = await banks.findOne({
+        const result = await debtors.findOne({
             where: {
                 deleted: { [Op.eq]: 0 },
                 id: { [Op.eq]: req.query.id }
