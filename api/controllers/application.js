@@ -1,4 +1,5 @@
 
+const { generateRandomString } = require('../../utils')
 const db = require('../models')
 const applications = db.applications
 const debtors = db.debtors
@@ -127,6 +128,42 @@ exports.update = async (req, res) => {
         return
     } catch (error) {
         return res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+    }
+}
+
+exports.approval = async (req, res) => {
+    try {
+        const result = await applications.findOne({
+            where: {
+                deleted: { [Op.eq]: 0 },
+                id: { [Op.eq]: req.body.id }
+            }
+        })
+        if (!result) {
+            return res.status(404).send({ message: "Data tidak ditemukan!" })
+        }
+        const payload = {
+            ...req.body,
+            ...req.body.status == "approved" && { contract_no: generateRandomString(8) },
+            ...req.body.status == "approved" && {
+                approved_by: {
+                    admin_name: req.body.admin.name,
+                    admin_id: req.body.admin.id,
+                    date: new Date()
+                }
+            },
+            status: req.body.status == "rejected" ? "rejected" : "approved"
+        }
+        const onUpdate = await applications.update(payload, {
+            where: {
+                deleted: { [Op.eq]: 0 },
+                id: { [Op.eq]: req.body.id }
+            }
+        })
+        res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
+        return
+    } catch (error) {
+        return res.status(500).send({ message: "Gagal ubah data", error: error })
     }
 }
 

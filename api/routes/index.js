@@ -5,7 +5,6 @@ module.exports = (app) => {
     const cBank = require('../controllers/bank.js');
     const cDebtor = require('../controllers/debtor.js');
     const cApplication = require('../controllers/application.js');
-    // const stocks = require('../controllers/stock.js');
     // const prices = require('../controllers/price.js');
 
     app.get('/user/list', middlewareHere, cUser.list);
@@ -26,6 +25,7 @@ module.exports = (app) => {
 
     app.get('/application/list', middlewareHere, cApplication.list);
     app.post('/application', middlewareHere, cApplication.create);
+    app.post('/application/approval', middlewareHere, cApplication.approval);
     app.patch('/application', middlewareHere, cApplication.update);
     app.delete('/application', middlewareHere, cApplication.delete);
 
