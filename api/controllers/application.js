@@ -174,7 +174,8 @@ exports.approval = async (req, res) => {
                 status: 'unpaid'
             };
             let dates = new Date();
-            for (let index = 0; index < result?.year; index++) {
+            let monthly = year * 12;
+            for (let index = 0; index < monthly; index++) {
                 dates.setDate(dates.getDate() + 30);
                 await payments.create({ ...payload, due_date: dates })
             }
