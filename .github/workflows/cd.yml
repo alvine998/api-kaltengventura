@@ -2,7 +2,7 @@ on:
   push:
     branches: [master]
   pull_request:
-    branches: [master] 
+    branches: [master]
 
 jobs:
   build:
@@ -32,10 +32,5 @@ jobs:
           tags: kiniku90/backend-api:kaltengventura-api
           no-cache: true
 
-      # - name: curl
-      #   uses: wei/curl@master
-      #   with:
-      #     args: -X POST http://gojay.co.id:9000/api/webhooks/bf1df474-8d01-4e69-87b0-88f9a40fc465
-
       - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }} 
+        run: echo ${{ steps.docker_build.outputs.digest }}
