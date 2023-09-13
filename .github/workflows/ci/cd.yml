@@ -1,0 +1,41 @@
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: Build and Push to Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: kiniku90
+          password: Kinikumuda2020
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: kiniku90/backend-api:kaltengventura-api
+          no-cache: true
+
+      # - name: curl
+      #   uses: wei/curl@master
+      #   with:
+      #     args: -X POST http://gojay.co.id:9000/api/webhooks/bf1df474-8d01-4e69-87b0-88f9a40fc465
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
