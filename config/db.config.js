@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-    HOST: process.env.DB_HOST || "http:gojay.co.id:81",
+    HOST: process.env.DB_HOST || "68.183.183.195:81",
     USER: "root",
     PASSWORD: process.env.DB_PASSWORD || "adminroot0987123",
     DB: "kaltengventura",
