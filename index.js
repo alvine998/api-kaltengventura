@@ -5,7 +5,7 @@ const app = express();
 require('dotenv').config();
 
 var corsOptions = {
-    origin: "http://localhost:8081"
+    origin: "*"
 };
 
 app.use(cors(corsOptions));
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to API Kalteng Ventura V1" });
+    res.json({ message: "Welcome to API Kalteng Ventura V2" });
 });
 require('./api/routes')(app);
 
