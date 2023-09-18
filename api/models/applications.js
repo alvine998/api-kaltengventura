@@ -12,14 +12,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       comment: "if approved it filled"
     },
-    debtor_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    debtor_name: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false

@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require('body-parser')
 
 const app = express();
 require('dotenv').config();
@@ -7,6 +8,20 @@ require('dotenv').config();
 var corsOptions = {
     origin: "*"
 };
+
+global.__basedir = __dirname;
+const path = require('path')
+app.use(express.static(path.join(__dirname, 'static')))
+console.log(__dirname+'static', 'lll');
+
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(
+    bodyParser.urlencoded({
+        extended: true,
+        limit: '100mb',
+        parameterLimit: 500000,
+    }),
+);
 
 app.use(cors(corsOptions));
 const db = require("./api/models");

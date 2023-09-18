@@ -1,11 +1,13 @@
 const { middlewareHere } = require('../middleware/index.js');
+const uploadFile = require('../middleware/upload.js');
 
 module.exports = (app) => {
     const cUser = require('../controllers/user.js');
     const cBank = require('../controllers/bank.js');
     const cDebtor = require('../controllers/debtor.js');
     const cApplication = require('../controllers/application.js');
-    // const prices = require('../controllers/price.js');
+    const cUpload = require('../controllers/upload.js');
+    const cPayment = require('../controllers/payment.js');
 
     app.get('/user/list', middlewareHere, cUser.list);
     app.post('/user', middlewareHere, cUser.create);
@@ -28,6 +30,10 @@ module.exports = (app) => {
     app.post('/application/approval', middlewareHere, cApplication.approval);
     app.patch('/application', middlewareHere, cApplication.update);
     app.delete('/application', middlewareHere, cApplication.delete);
+
+    app.get('/payment/list', middlewareHere, cPayment.list);
+
+    app.post('/image/upload', uploadFile.single("file"), cUpload.uploadFiles)
 
 
 }

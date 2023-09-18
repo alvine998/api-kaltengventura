@@ -43,7 +43,7 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        let requiredAttributes = ['user_id', 'user_name', 'debtor_id', 'debtor_name', 'loan', 'year', 'installment']
+        let requiredAttributes = ['user_id', 'user_name', 'loan', 'year', 'installment']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
@@ -66,20 +66,6 @@ exports.create = async (req, res) => {
                 status: "error",
                 items: "",
                 error_message: "Data user tidak ditemukan!",
-                code: 400
-            })
-        }
-        const existDebt = await debtors.findOne({
-            where: {
-                deleted: { [Op.eq]: 0 },
-                id: { [Op.eq]: req.body.debtor_id }
-            }
-        })
-        if (!existDebt) {
-            return res.status(400).send({
-                status: "error",
-                items: "",
-                error_message: "Data debtor tidak ditemukan!",
                 code: 400
             })
         }
@@ -164,7 +150,6 @@ exports.approval = async (req, res) => {
         if (req.body.status == "approved") {
             const payload = {
                 application_id: result?.id,
-                application_name: result?.debtor_name,
                 application_contract: result?.contract_no,
                 fee: result?.installment,
                 payment_rate: 0,

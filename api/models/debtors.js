@@ -7,6 +7,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    user_name: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false
@@ -37,11 +45,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     ktp: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
       allowNull: false
     },
     kk: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
       allowNull: false
     },
     status: {

@@ -24,7 +24,7 @@ db.applications = require("./applications.js")(sequelize, Sequelize);
 db.banks = require("./banks.js")(sequelize, Sequelize);
 db.debtors = require("./debtors.js")(sequelize, Sequelize);
 db.payments = require("./payments.js")(sequelize, Sequelize);
-// db.transactions = require("./transactions.js")(sequelize, Sequelize);
+db.images = require("./images.js")(sequelize, Sequelize);
 // db.categories = require("./categories.js")(sequelize, Sequelize);
 
 module.exports = db;

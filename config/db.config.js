@@ -1,9 +1,9 @@
 require('dotenv').config()
 
 module.exports = {
-    HOST: process.env.DB_HOST || "68.183.183.195:81",
+    HOST: process.env.DB_HOST || "",
     USER: "root",
-    PASSWORD: process.env.DB_PASSWORD || "adminroot0987123",
+    PASSWORD: process.env.DB_PASSWORD || "",
     DB: "kaltengventura",
     dialect: "mysql",
     pool: {
