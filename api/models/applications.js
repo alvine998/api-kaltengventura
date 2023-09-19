@@ -34,7 +34,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: "per month"
     },
     status: {
-      type: DataTypes.ENUM('approved','rejected','waiting'),
+      type: DataTypes.ENUM('approved','rejected','waiting','done'),
       allowNull: false,
       defaultValue: "waiting"
     },

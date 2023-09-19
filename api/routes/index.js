@@ -32,6 +32,7 @@ module.exports = (app) => {
     app.delete('/application', middlewareHere, cApplication.delete);
 
     app.get('/payment/list', middlewareHere, cPayment.list);
+    app.patch('/payment', middlewareHere, cPayment.update);
 
     app.post('/image/upload', uploadFile.single("file"), cUpload.uploadFiles)
 

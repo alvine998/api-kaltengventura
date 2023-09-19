@@ -46,3 +46,30 @@ exports.list = async (req, res) => {
         return res.status(500).send({ message: "Server mengalami gangguan!", error: error })
     }
 };
+
+exports.update = async (req, res) => {
+    try {
+        const result = await payments.findOne({
+            where: {
+                deleted: { [Op.eq]: 0 },
+                id: { [Op.eq]: req.body.id }
+            }
+        })
+        if (!result) {
+            return res.status(404).send({ message: "Data tidak ditemukan!" })
+        }
+        const payload = {
+            ...req.body,
+        }
+        const onUpdate = await payments.update(payload, {
+            where: {
+                deleted: { [Op.eq]: 0 },
+                id: { [Op.eq]: req.body.id }
+            }
+        })
+        res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
+        return
+    } catch (error) {
+        return res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+    }
+}

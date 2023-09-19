@@ -29,10 +29,21 @@ exports.list = async (req, res) => {
             ],
             limit: size
         })
+        let resPay = 0
+        if (req.query.id) {
+            resPay = await payments.findAll({
+                where: {
+                    deleted: { [Op.eq]: 0 },
+                    status: { [Op.eq]: 'unpaid' },
+                    application_id: { [Op.eq]: req.query.id }
+                }
+            })
+        }
         return res.status(200).send({
             status: "success",
             total_items: result.length,
             items: result,
+            tempo: resPay[0]?.due_date,
             code: 200
         })
     } catch (error) {
