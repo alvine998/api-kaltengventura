@@ -169,7 +169,7 @@ exports.approval = async (req, res) => {
                 status: 'unpaid'
             };
             let dates = new Date();
-            let monthly = year * 12;
+            let monthly = result.year * 12;
             for (let index = 0; index < monthly; index++) {
                 dates.setDate(dates.getDate() + 30);
                 await payments.create({ ...payload, due_date: dates })
@@ -178,7 +178,9 @@ exports.approval = async (req, res) => {
         res.status(200).send({ message: "Berhasil ubah status", update: onUpdate })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal ubah status", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal ubah status", error: error })
+        return
     }
 }
 
