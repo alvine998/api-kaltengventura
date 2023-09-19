@@ -176,10 +176,11 @@ exports.approval = async (req, res) => {
             };
             let dates = new Date();
             let monthly = result.year * 12;
+            let rem_month = monthly
             for (let index = 0; index < monthly; index++) {
                 dates.setDate(dates.getDate() + 30);
-                await payments.create({ ...payload, due_date: formatDateToIndonesian(dates), remaining_payment: `${monthly} Bulan`, payment_no: `Ke ${index + 1}` })
-                monthly -= 1
+                await payments.create({ ...payload, due_date: formatDateToIndonesian(dates), remaining_payment: `${rem_month} Bulan`, payment_no: `Ke ${index + 1}` })
+                rem_month -= 1
             }
         }
         res.status(200).send({ message: "Berhasil ubah status", update: onUpdate })
