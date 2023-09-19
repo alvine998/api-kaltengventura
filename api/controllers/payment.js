@@ -67,7 +67,7 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            ...req.body.payment_date && { payment_date: formatDateToIndonesian(req.body.payment_date) }
+            payment_date: formatDateToIndonesian(new Date(req.body.payment_date))
         }
         const onUpdate = await payments.update(payload, {
             where: {
@@ -78,6 +78,8 @@ exports.update = async (req, res) => {
         res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        return
     }
 }
