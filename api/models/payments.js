@@ -44,6 +44,16 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: "fix payment + payment rate"
     },
+    remaining_payment: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      comment: "Sisa Tagihan"
+    },
+    payment_no: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      comment: "Tagihan Ke"
+    },
     bank_name: {
       type: DataTypes.STRING(100),
       allowNull: true,
