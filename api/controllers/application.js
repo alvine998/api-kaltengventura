@@ -145,9 +145,10 @@ exports.approval = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Data tidak ditemukan!" })
         }
+        let randomess = generateRandomString(8)
         const payload = {
             ...req.body,
-            ...req.body.status == "approved" && { contract_no: generateRandomString(8) },
+            ...req.body.status == "approved" && { contract_no: randomess },
             ...req.body.status == "approved" && {
                 approved_by: {
                     admin_name: req.body.admin.name,
@@ -166,7 +167,7 @@ exports.approval = async (req, res) => {
         if (req.body.status == "approved") {
             const payload = {
                 application_id: result?.id,
-                application_contract: result?.contract_no,
+                application_contract: randomess,
                 fee: result?.installment,
                 payment_rate: 0,
                 payment_fee: 0,
