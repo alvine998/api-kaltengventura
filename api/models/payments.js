@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     due_date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     payment_rate: {
@@ -35,7 +35,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: "fix payment"
     },
     payment_date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.TEXT,
       allowNull: true,
       comment: "due date"
     },

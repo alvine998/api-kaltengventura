@@ -9,3 +9,17 @@ exports.generateRandomString = (length) => {
 
     return randomString;
 }
+
+exports.formatDateToIndonesian = (date) => {
+    const monthsInIndonesian = [
+        'Jan', 'Feb', 'Mar', 'Apr',
+        'Mei', 'Jun', 'Jul', 'Agu',
+        'Sep', 'Okt', 'Nov', 'Des'
+    ];
+
+    const month = monthsInIndonesian[date.getMonth()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+};

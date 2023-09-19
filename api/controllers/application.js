@@ -1,5 +1,5 @@
 
-const { generateRandomString } = require('../../utils')
+const { generateRandomString, formatDateToIndonesian } = require('../../utils')
 const db = require('../models')
 const applications = db.applications
 const payments = db.payments
@@ -178,7 +178,7 @@ exports.approval = async (req, res) => {
             let monthly = result.year * 12;
             for (let index = 0; index < monthly; index++) {
                 dates.setDate(dates.getDate() + 30);
-                await payments.create({ ...payload, due_date: dates })
+                await payments.create({ ...payload, due_date: formatDateToIndonesian(dates) })
             }
         }
         res.status(200).send({ message: "Berhasil ubah status", update: onUpdate })
