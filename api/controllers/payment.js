@@ -1,5 +1,5 @@
 
-const { formatDateToIndonesian } = require('../../utils');
+const { formatDateToIndonesian, base64ToFormData } = require('../../utils');
 const db = require('../models')
 const payments = db.payments
 const Op = db.Sequelize.Op
@@ -67,7 +67,8 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            payment_date: formatDateToIndonesian(new Date(req.body.payment_date))
+            payment_date: formatDateToIndonesian(new Date(req.body.payment_date)),
+            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
         }
         const onUpdate = await payments.update(payload, {
             where: {
