@@ -44,11 +44,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    husband_ktp: {
+    ktp: {
       type: DataTypes.JSON,
-      allowNull: true
+      allowNull: false
     },
-    wife_ktp: {
+    partner_ktp: {
       type: DataTypes.JSON,
       allowNull: true
     },

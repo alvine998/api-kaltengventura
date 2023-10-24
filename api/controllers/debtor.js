@@ -66,7 +66,7 @@ exports.uploadImage = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        let requiredAttributes = ['name', 'address', 'field_type', 'place_status', 'mother_name', 'kk']
+        let requiredAttributes = ['name', 'address', 'field_type', 'place_status', 'mother_name', 'ktp', 'kk']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
@@ -81,8 +81,8 @@ exports.create = async (req, res) => {
 
         const payload = {
             ...req.body,
-            ...req.body.husband_ktp && { husband_ktp: base64ToFormData(req.body.husband_ktp) },
-            ...req.body.wife_ktp && { wife_ktp: base64ToFormData(req.body.wife_ktp) },
+            ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
+            ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
             ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
         };
         const result = await debtors.create(payload)
@@ -111,8 +111,8 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            ...req.body.husband_ktp && { husband_ktp: base64ToFormData(req.body.husband_ktp) },
-            ...req.body.wife_ktp && { wife_ktp: base64ToFormData(req.body.wife_ktp) },
+            ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
+            ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
             ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
         }
         const onUpdate = await debtors.update(payload, {
