@@ -60,7 +60,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: "filled after verified"
     },
     account_number: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
       allowNull: true,
       comment: "filled after verified"
     },
