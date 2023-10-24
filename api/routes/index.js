@@ -24,6 +24,7 @@ module.exports = (app) => {
     app.post('/debtor', middlewareHere, cDebtor.create);
     app.patch('/debtor', middlewareHere, cDebtor.update);
     app.delete('/debtor', middlewareHere, cDebtor.delete);
+    app.post('/debtor/upload', middlewareHere, cDebtor.uploadImage);
 
     app.get('/application/list', middlewareHere, cApplication.list);
     app.post('/application', middlewareHere, cApplication.create);

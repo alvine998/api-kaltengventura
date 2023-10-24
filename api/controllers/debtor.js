@@ -3,6 +3,9 @@ const db = require('../models')
 const debtors = db.debtors
 const Op = db.Sequelize.Op
 require('dotenv').config()
+const fs = require('fs')
+const path = require('path')
+const { base64ToFormData } = require('../../utils')
 
 // Retrieve and return all notes from the database.
 exports.list = async (req, res) => {
@@ -41,9 +44,29 @@ exports.list = async (req, res) => {
     }
 };
 
+exports.uploadImage = async (req, res) => {
+    try {
+        const base64 = req.body.base64Data;
+        const data = base64.replace(/^data:image\/(png|jpeg);base64,/, '');
+        const extension = base64.startsWith('data:image/png') ? 'png' : 'jpeg';
+        const fileName = `image.${extension}`;
+        const buffer = Buffer.from(data, 'base64');
+        const uploadDirectory = path.join(__dirname, '..', '..', 'resources', 'uploads');
+        const filePath = path.join(uploadDirectory, fileName);
+        console.log(uploadDirectory);
+        console.log(filePath);
+        fs.writeFileSync(filePath, buffer);
+        res.sendFile(filePath);
+        return
+    } catch (error) {
+        console.log(error);
+        return
+    }
+}
+
 exports.create = async (req, res) => {
     try {
-        let requiredAttributes = ['name', 'address', 'field_type', 'place_status', 'mother_name', 'ktp', 'kk']
+        let requiredAttributes = ['name', 'address', 'field_type', 'place_status', 'mother_name', 'kk']
         for (let index = 0; index < requiredAttributes.length; index++) {
             const element = requiredAttributes[index];
             if (!req.body[element]) {
@@ -55,8 +78,12 @@ exports.create = async (req, res) => {
                 })
             }
         }
+
         const payload = {
             ...req.body,
+            ...req.body.husband_ktp && { husband_ktp: base64ToFormData(req.body.husband_ktp) },
+            ...req.body.wife_ktp && { wife_ktp: base64ToFormData(req.body.wife_ktp) },
+            ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
         };
         const result = await debtors.create(payload)
         return res.status(200).send({
@@ -84,6 +111,9 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
+            ...req.body.husband_ktp && { husband_ktp: base64ToFormData(req.body.husband_ktp) },
+            ...req.body.wife_ktp && { wife_ktp: base64ToFormData(req.body.wife_ktp) },
+            ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
         }
         const onUpdate = await debtors.update(payload, {
             where: {

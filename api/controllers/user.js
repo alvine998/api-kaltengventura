@@ -5,6 +5,7 @@ const Op = db.Sequelize.Op
 const bcrypt = require('bcryptjs')
 const fs = require('fs')
 const crypto = require('crypto')
+const { base64ToFormData } = require('../../utils')
 require('dotenv').config()
 
 // Retrieve and return all notes from the database.
@@ -71,7 +72,8 @@ exports.create = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            password: bcrypt.hashSync(req.body.password, 8)
+            password: bcrypt.hashSync(req.body.password, 8),
+            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
         };
         const result = await users.create(payload)
         return res.status(200).send({
@@ -121,7 +123,8 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            ...req.body.password && { password: bcrypt.hashSync(req.body.password, 8) }
+            ...req.body.password && { password: bcrypt.hashSync(req.body.password, 8) },
+            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
         }
         const onUpdate = await users.update(payload, {
             where: {

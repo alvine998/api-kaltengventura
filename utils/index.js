@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 exports.generateRandomString = (length) => {
     const characters = '0123456789';
     let randomString = '';
@@ -23,3 +26,14 @@ exports.formatDateToIndonesian = (date) => {
 
     return `${day} ${month} ${year}`;
 };
+
+exports.base64ToFormData = (base64) => {
+    const data = base64.replace(/^data:image\/(png|jpeg);base64,/, '');
+        const extension = base64.startsWith('data:image/png') ? 'png' : 'jpeg';
+        const fileName = `${this.generateRandomString(10)}.${extension}`;
+        const buffer = Buffer.from(data, 'base64');
+        const uploadDirectory = path.join(__dirname, '..', 'resources', 'uploads');
+        const filePath = path.join(uploadDirectory, fileName);
+        fs.writeFileSync(filePath, buffer);
+    return `https://skvapi.kinikumuda.id/resources/uploads/${fileName}`;
+}
