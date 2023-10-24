@@ -68,7 +68,7 @@ exports.update = async (req, res) => {
         const payload = {
             ...req.body,
             payment_date: formatDateToIndonesian(new Date(req.body.payment_date)),
-            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
+            ...req.body.photo && !req.body.photo?.includes("https://") && { photo: base64ToFormData(req.body.photo) }
         }
         const onUpdate = await payments.update(payload, {
             where: {

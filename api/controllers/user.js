@@ -124,7 +124,7 @@ exports.update = async (req, res) => {
         const payload = {
             ...req.body,
             ...req.body.password && { password: bcrypt.hashSync(req.body.password, 8) },
-            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
+            ...req.body.photo && !req.body.photo?.includes("https://") && { photo: base64ToFormData(req.body.photo) }
         }
         const onUpdate = await users.update(payload, {
             where: {

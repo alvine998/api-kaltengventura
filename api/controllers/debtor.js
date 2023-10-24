@@ -111,9 +111,9 @@ exports.update = async (req, res) => {
         }
         const payload = {
             ...req.body,
-            ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
-            ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
-            ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
+            ...req.body.ktp && !req.body.ktp?.includes("https://") && { ktp: base64ToFormData(req.body.ktp) },
+            ...req.body.partner_ktp && !req.body.partner_ktp?.includes("https://") && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
+            ...req.body.kk && !req.body.kk?.includes("https://") && { kk: base64ToFormData(req.body.kk) },
         }
         const onUpdate = await debtors.update(payload, {
             where: {
