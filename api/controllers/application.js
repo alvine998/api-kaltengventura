@@ -29,8 +29,10 @@ exports.list = async (req, res) => {
             order: [
                 ['created_on', 'DESC'],
             ],
-            limit: size,
-            offset: offset
+            ...req.query.pagination == 'true' && {
+                limit: size,
+                offset: offset
+            }
         })
         const total_pages = Math.ceil(count / size);
 

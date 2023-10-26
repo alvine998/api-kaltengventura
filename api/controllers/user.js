@@ -11,8 +11,10 @@ require('dotenv').config()
 // Retrieve and return all notes from the database.
 exports.list = async (req, res) => {
     try {
-        const size = req.query.size || 10;
-        const result = await users.findAll({
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 10;
+        const offset = (page - 1) * size
+        const { count, rows: result } = await users.findAndCountAll({
             where: {
                 deleted: { [Op.eq]: 0 },
                 ...req.query.search && {
@@ -24,20 +26,29 @@ exports.list = async (req, res) => {
                 },
                 ...req.query.id && { id: { [Op.eq]: req.query.id } },
                 ...req.query.status && { status: { [Op.eq]: req.query.status } },
+                ...req.query.from && { from: { [Op.eq]: req.query.from } },
             },
             order: [
                 ['created_on', 'DESC'],
             ],
-            limit: size
+            ...req.query.pagination == "true" && {
+                limit: size,
+                offset: offset
+            }
         })
+        const total_pages = Math.ceil(count / size);
+
         return res.status(200).send({
             status: "success",
-            total_items: result.length,
+            total_items: count,
+            total_pages: total_pages,
             items: result,
             code: 200
         })
     } catch (error) {
-        return res.status(500).send({ message: "Server mengalami gangguan!", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Server mengalami gangguan!", error: error })
+        return
     }
 };
 

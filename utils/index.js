@@ -35,5 +35,5 @@ exports.base64ToFormData = (base64) => {
         const uploadDirectory = path.join(__dirname, '..', 'resources', 'uploads');
         const filePath = path.join(uploadDirectory, fileName);
         fs.writeFileSync(filePath, buffer);
-    return `https://skvapi.kinikumuda.id/resources/uploads/${fileName}`;
+    return `http://localhost:8080/resources/uploads/${fileName}`;
 }

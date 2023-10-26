@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('users', {
     id: {
       autoIncrement: true,
@@ -28,8 +28,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('active','nonactive'),
+      type: DataTypes.ENUM('active', 'nonactive'),
       allowNull: false
+    },
+    from: {
+      type: DataTypes.ENUM('admin', 'apps'),
+      allowNull: false,
+      defaultValue: "apps"
     },
     created_on: {
       type: DataTypes.DATE,
