@@ -91,6 +91,26 @@ exports.create = async (req, res) => {
             ...req.body,
         };
         const result = await applications.create(payload)
+        if (req.body.user_from == "admin") {
+            const payload2 = {
+                application_id: result?.id,
+                application_contract: req.body.contract_no,
+                fee: req.body.installment,
+                payment_rate: 0,
+                payment_fee: 0,
+                payment_date: null,
+                total_payment: req.body.installment,
+                status: req.body.status == "approved" ? 'unpaid' : 'paid'
+            };
+            let dates = new Date(req.body.start_date);
+            let monthly = req.body.year * 12;
+            let rem_month = monthly
+            for (let index = 0; index < monthly; index++) {
+                dates.setMonth(dates.getMonth() + 1);
+                await payments.create({ ...payload2, due_date: formatDateToIndonesian(dates), remaining_payment: `${rem_month} Bulan`, payment_no: `Ke ${index + 1}` })
+                rem_month -= 1
+            }
+        }
         return res.status(200).send({
             status: "success",
             items: result,
