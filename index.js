@@ -9,6 +9,8 @@ var corsOptions = {
     origin: "*"
 };
 
+console.log("Login")
+
 global.__basedir = __dirname;
 const path = require('path')
 app.use(express.static(path.join(__dirname, 'static')))
