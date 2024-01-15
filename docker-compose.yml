@@ -3,7 +3,9 @@
 version: "3"
 
 services:
-  web:
+  api:
+    networks:
+      - api_kaltengventura
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,3 +13,7 @@ services:
       - "8080:8080"
     environment:
       - NODE_ENV=production
+
+networks:
+  api_kaltengventura:
+    external: true
