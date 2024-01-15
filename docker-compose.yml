@@ -5,7 +5,7 @@ version: "3"
 services:
   api:
     networks:
-      - api_kaltengventura
+      - proxynet
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,5 +15,5 @@ services:
       - NODE_ENV=production
 
 networks:
-  api_kaltengventura:
-    external: true
+  proxynet:
+    name: custom_network
