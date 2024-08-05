@@ -2,6 +2,7 @@
 const db = require('../models')
 const debtors = db.debtors
 const Op = db.Sequelize.Op
+const bucket = require('../../config/firebase')
 require('dotenv').config()
 const fs = require('fs')
 const path = require('path')
@@ -78,6 +79,38 @@ exports.create = async (req, res) => {
                 })
             }
         }
+        const buffers = [
+            { label: "ktp", data: Buffer.from(req.body.ktp, 'base64') },
+            { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
+            { label: "kk", data: Buffer.from(req.body.kk, 'base64') }
+        ];
+        const uploadPromise = buffers.map(async (file) => {
+            const { data, label } = file
+            const buffer = Buffer.from(data, 'base64');
+            const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
+
+            return new Promise((resolve, reject) => {
+                const stream = storageFile.createWriteStream({
+                    metadata: {
+                        contentType: 'image/*' // Adjust according to your file type
+                    }
+                });
+
+                stream.on('error', (err) => {
+                    console.error(err);
+                    reject('File upload failed.');
+                });
+
+                stream.on('finish', async () => {
+                    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
+                    resolve(publicUrl);
+                });
+
+                stream.end(buffer);
+            });
+        })
+
+        const uploadedFiles = await Promise.all(uploadPromise);
 
         const payload = {
             ...req.body,
@@ -85,7 +118,9 @@ exports.create = async (req, res) => {
             ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
             ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
         };
-        const result = await debtors.create(payload)
+        console.log(payload, 'payload');
+        console.log(uploadedFiles, 'uploaded');
+        // const result = await debtors.create(payload)
         return res.status(200).send({
             status: "success",
             items: result,
@@ -109,6 +144,11 @@ exports.update = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Data tidak ditemukan!" })
         }
+        const bufferKTP = Buffer.from(req.body.ktp, 'base64');
+        const bufferPartnerKTP = Buffer.from(req.body.partner_ktp, 'base64');
+        const bufferKK = Buffer.from(req.body.kk, 'base64');
+
+
         const payload = {
             ...req.body,
             ...req.body.ktp && !req.body.ktp?.includes("http://") && { ktp: base64ToFormData(req.body.ktp) },
