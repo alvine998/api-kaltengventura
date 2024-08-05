@@ -1,10 +1,10 @@
 require('dotenv').config()
 
 module.exports = {
-    HOST: "localhost",
-    USER: "root",
-    PASSWORD: "root1234",
-    DB: "kaltengventura",
+    HOST: "202.52.146.203",
+    USER: "stokinve_root",
+    PASSWORD: "stokinventory.com",
+    DB: "stokinve_kaltengventura",
     dialect: "mysql",
     pool: {
         max: 5,
