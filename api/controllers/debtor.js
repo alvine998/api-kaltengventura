@@ -80,14 +80,18 @@ exports.create = async (req, res) => {
             }
         }
         const buffers = [
-            { label: "ktp", data: Buffer.from(req.body.ktp, 'base64') },
-            req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
-            { label: "kk", data: Buffer.from(req.body.kk, 'base64') }
+            { label: "ktp", data: Buffer.from(req.body.ktp.replace(/^data:image\/png;base64,/, ''), 'base64') },
+            req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp.replace(/^data:image\/png;base64,/, ''), 'base64') },
+            { label: "kk", data: Buffer.from(req.body.kk.replace(/^data:image\/png;base64,/, ''), 'base64') }
         ].filter(v => v !== "undefined");
         const uploadPromise = buffers.map(async (file) => {
             const { data, label } = file
             const buffer = Buffer.from(data, 'base64');
             const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
+            const getFileMetadata = async (filePath) => {
+                const [metadata] = await bucket.file(filePath).getMetadata();
+                console.log(metadata);
+            };
 
             return new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
@@ -102,6 +106,7 @@ exports.create = async (req, res) => {
                 });
 
                 stream.on('finish', async () => {
+                    await storageFile.makePublic();
                     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
                     resolve(publicUrl);
                 });
@@ -116,7 +121,7 @@ exports.create = async (req, res) => {
             ...req.body,
             ...req.body.ktp && { ktp: uploadedFiles[0] },
             ...req.body.partner_ktp && { partner_ktp: req.body.partner_ktp ? uploadedFiles[1] : null },
-            ...req.body.kk && { kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1]  },
+            ...req.body.kk && { kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1] },
         };
         const result = await debtors.create(payload)
         return res.status(200).send({
@@ -186,6 +191,6 @@ exports.delete = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: "Gagal mendapatkan data", error: error })
-        return 
+        return
     }
 }
