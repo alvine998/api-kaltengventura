@@ -81,7 +81,7 @@ exports.create = async (req, res) => {
         }
         const buffers = [
             { label: "ktp", data: Buffer.from(req.body.ktp, 'base64') },
-            ...req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
+            req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
             { label: "kk", data: Buffer.from(req.body.kk, 'base64') }
         ].filter(v => v !== "undefined");
         const uploadPromise = buffers.map(async (file) => {
