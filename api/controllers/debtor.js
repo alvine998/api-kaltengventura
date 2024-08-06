@@ -84,16 +84,22 @@ exports.create = async (req, res) => {
             req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp.replace(/^data:image\/png;base64,/, ''), 'base64') },
             { label: "kk", data: Buffer.from(req.body.kk.replace(/^data:image\/png;base64,/, ''), 'base64') }
         ].filter(v => v !== "undefined");
+
+        const getDownloadUrl = async (file) => {
+            const [url] = await file.getSignedUrl({
+                action: 'read',
+                expires: '03-01-2500', // Set expiration date as needed
+            });
+            return url;
+        };
+
         const uploadPromise = buffers.map(async (file) => {
             const { data, label } = file
             const buffer = Buffer.from(data, 'base64');
             const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
-            const getFileMetadata = async (filePath) => {
-                const [metadata] = await bucket.file(filePath).getMetadata();
-                console.log(metadata);
-            };
+            
 
-            return new Promise((resolve, reject) => {
+            new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
                     metadata: {
                         contentType: 'image/png' // Adjust according to your file type
@@ -113,6 +119,8 @@ exports.create = async (req, res) => {
 
                 stream.end(buffer);
             });
+
+            return await getDownloadUrl(storageFile)
         })
 
         const uploadedFiles = await Promise.all(uploadPromise);
