@@ -80,9 +80,9 @@ exports.create = async (req, res) => {
             }
         }
         const buffers = [
-            { label: "ktp", data: Buffer.from(req.body.ktp.replace(/^data:image\/png;base64,/, ''), 'base64') },
-            req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp.replace(/^data:image\/png;base64,/, ''), 'base64') },
-            { label: "kk", data: Buffer.from(req.body.kk.replace(/^data:image\/png;base64,/, ''), 'base64') }
+            { label: "ktp", data: Buffer.from(req.body.ktp.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.ktp },
+            req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.partner_ktp },
+            { label: "kk", data: Buffer.from(req.body.kk.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.kk }
         ].filter(v => v !== "undefined");
 
         const getDownloadUrl = async (file) => {
@@ -94,15 +94,15 @@ exports.create = async (req, res) => {
         };
 
         const uploadPromise = buffers.map(async (file) => {
-            const { data, label } = file
+            const { data, label, raw } = file
             const buffer = Buffer.from(data, 'base64');
             const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
-            
+
 
             new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
                     metadata: {
-                        contentType: 'image/png' // Adjust according to your file type
+                        contentType: raw.startsWith('data:image/png') ? 'image/png' : raw.startsWith('data:image/png') ? 'image/jpg' : 'image/jpeg' // Adjust according to your file type
                     }
                 });
 
