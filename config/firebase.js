@@ -4,7 +4,7 @@ const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT); // Adju
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'gs://kaltengventura-4043c.appspot.com' // Replace with your actual bucket name
+  storageBucket: 'kaltengventura-4043c.appspot.com' // Replace with your actual bucket name
 });
 
 const bucket = admin.storage().bucket();
