@@ -81,15 +81,13 @@ exports.create = async (req, res) => {
         }
         const buffers = [
             { label: "ktp", data: Buffer.from(req.body.ktp, 'base64') },
-            { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
+            ...req.body.partner_ktp && { label: "partnerktp", data: Buffer.from(req.body.partner_ktp, 'base64') },
             { label: "kk", data: Buffer.from(req.body.kk, 'base64') }
-        ];
+        ].filter(v => v !== "undefined");
         const uploadPromise = buffers.map(async (file) => {
             const { data, label } = file
             const buffer = Buffer.from(data, 'base64');
             const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
-
-            console.log(storageFile,'---ggg');
 
             return new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
@@ -114,18 +112,16 @@ exports.create = async (req, res) => {
 
         const uploadedFiles = await Promise.all(uploadPromise);
 
-        // const payload = {
-        //     ...req.body,
-        //     ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
-        //     ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
-        //     ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
-        // };
-        // console.log(payload, 'payload');
-        // console.log(uploadedFiles, 'uploaded');
-        // const result = await debtors.create(payload)
+        const payload = {
+            ...req.body,
+            ...req.body.ktp && { ktp: uploadedFiles[0] },
+            ...req.body.partner_ktp && { partner_ktp: req.body.partner_ktp ? uploadedFiles[1] : null },
+            ...req.body.kk && { kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1]  },
+        };
+        const result = await debtors.create(payload)
         return res.status(200).send({
             status: "success",
-            items: uploadedFiles,
+            items: result,
             code: 200
         })
     } catch (error) {
