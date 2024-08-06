@@ -142,16 +142,10 @@ exports.update = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Data tidak ditemukan!" })
         }
-        const bufferKTP = Buffer.from(req.body.ktp, 'base64');
-        const bufferPartnerKTP = Buffer.from(req.body.partner_ktp, 'base64');
-        const bufferKK = Buffer.from(req.body.kk, 'base64');
 
 
         const payload = {
-            ...req.body,
-            ...req.body.ktp && !req.body.ktp?.includes("http://") && { ktp: base64ToFormData(req.body.ktp) },
-            ...req.body.partner_ktp && !req.body.partner_ktp?.includes("http://") && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
-            ...req.body.kk && !req.body.kk?.includes("http://") && { kk: base64ToFormData(req.body.kk) },
+            ...req.body
         }
         const onUpdate = await debtors.update(payload, {
             where: {
@@ -168,7 +162,9 @@ exports.update = async (req, res) => {
         res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        return
     }
 }
 
@@ -188,6 +184,8 @@ exports.delete = async (req, res) => {
         res.status(200).send({ message: "Berhasil hapus data" })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data", error: error })
+        return 
     }
 }
