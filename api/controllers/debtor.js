@@ -112,18 +112,18 @@ exports.create = async (req, res) => {
 
         const uploadedFiles = await Promise.all(uploadPromise);
 
-        const payload = {
-            ...req.body,
-            ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
-            ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
-            ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
-        };
-        console.log(payload, 'payload');
-        console.log(uploadedFiles, 'uploaded');
+        // const payload = {
+        //     ...req.body,
+        //     ...req.body.ktp && { ktp: base64ToFormData(req.body.ktp) },
+        //     ...req.body.partner_ktp && { partner_ktp: base64ToFormData(req.body.partner_ktp) },
+        //     ...req.body.kk && { kk: base64ToFormData(req.body.kk) },
+        // };
+        // console.log(payload, 'payload');
+        // console.log(uploadedFiles, 'uploaded');
         // const result = await debtors.create(payload)
         return res.status(200).send({
             status: "success",
-            items: result,
+            items: uploadedFiles,
             code: 200
         })
     } catch (error) {
