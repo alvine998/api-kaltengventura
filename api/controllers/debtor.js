@@ -92,7 +92,7 @@ exports.create = async (req, res) => {
             return new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
                     metadata: {
-                        contentType: 'image/*' // Adjust according to your file type
+                        contentType: 'image/png' // Adjust according to your file type
                     }
                 });
 
