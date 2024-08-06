@@ -89,6 +89,8 @@ exports.create = async (req, res) => {
             const buffer = Buffer.from(data, 'base64');
             const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
 
+            console.log(storageFile,'---ggg');
+
             return new Promise((resolve, reject) => {
                 const stream = storageFile.createWriteStream({
                     metadata: {
