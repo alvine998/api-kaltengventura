@@ -4,6 +4,7 @@ const db = require('../models')
 const payments = db.payments
 const Op = db.Sequelize.Op
 require('dotenv').config()
+const bucket = require('../../config/firebase')
 
 // Retrieve and return all notes from the database.
 exports.list = async (req, res) => {

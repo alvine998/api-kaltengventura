@@ -3,8 +3,7 @@ const db = require('../models')
 const users = db.users
 const Op = db.Sequelize.Op
 const bcrypt = require('bcryptjs')
-const fs = require('fs')
-const crypto = require('crypto')
+const bucket = require('../../config/firebase')
 const { base64ToFormData } = require('../../utils')
 require('dotenv').config()
 
@@ -81,10 +80,55 @@ exports.create = async (req, res) => {
         if (existUsers) {
             return res.status(404).send({ message: "Akun telah terdaftar!" })
         }
+        if(req.body.photo){
+            const buffers = [
+                { label: "photo", data: Buffer.from(req.body.photo.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.photo },
+            ].filter(v => v !== "undefined");
+    
+            const getDownloadUrl = async (file) => {
+                const [url] = await file.getSignedUrl({
+                    action: 'read',
+                    expires: '03-01-2500', // Set expiration date as needed
+                });
+                return url;
+            };
+    
+            uploadPromise = buffers.map(async (file) => {
+                const { data, label, raw } = file
+                const buffer = Buffer.from(data, 'base64');
+                const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
+    
+    
+                new Promise((resolve, reject) => {
+                    const stream = storageFile.createWriteStream({
+                        metadata: {
+                            contentType: raw.startsWith('data:image/png') ? 'image/png' : raw.startsWith('data:image/png') ? 'image/jpg' : 'image/jpeg' // Adjust according to your file type
+                        }
+                    });
+    
+                    stream.on('error', (err) => {
+                        console.error(err);
+                        reject('File upload failed.');
+                    });
+    
+                    stream.on('finish', async () => {
+                        await storageFile.makePublic();
+                        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
+                        resolve(publicUrl);
+                    });
+    
+                    stream.end(buffer);
+                });
+    
+                return await getDownloadUrl(storageFile)
+            })
+        }
+
+        const uploadedFiles = await Promise.all(uploadPromise);
         const payload = {
             ...req.body,
             password: bcrypt.hashSync(req.body.password, 8),
-            ...req.body.photo && { photo: base64ToFormData(req.body.photo) }
+            ...req.body.photo && { photo: uploadedFiles[0] }
         };
         const result = await users.create(payload)
         return res.status(200).send({
@@ -132,10 +176,55 @@ exports.update = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Data tidak ditemukan!" })
         }
+        if(req.body.photo){
+            const buffers = [
+                { label: "photo", data: Buffer.from(req.body.photo.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.photo },
+            ].filter(v => v !== "undefined");
+    
+            const getDownloadUrl = async (file) => {
+                const [url] = await file.getSignedUrl({
+                    action: 'read',
+                    expires: '03-01-2500', // Set expiration date as needed
+                });
+                return url;
+            };
+    
+            uploadPromise = buffers.map(async (file) => {
+                const { data, label, raw } = file
+                const buffer = Buffer.from(data, 'base64');
+                const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
+    
+    
+                new Promise((resolve, reject) => {
+                    const stream = storageFile.createWriteStream({
+                        metadata: {
+                            contentType: raw.startsWith('data:image/png') ? 'image/png' : raw.startsWith('data:image/png') ? 'image/jpg' : 'image/jpeg' // Adjust according to your file type
+                        }
+                    });
+    
+                    stream.on('error', (err) => {
+                        console.error(err);
+                        reject('File upload failed.');
+                    });
+    
+                    stream.on('finish', async () => {
+                        await storageFile.makePublic();
+                        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
+                        resolve(publicUrl);
+                    });
+    
+                    stream.end(buffer);
+                });
+    
+                return await getDownloadUrl(storageFile)
+            })
+        }
+
+        const uploadedFiles = await Promise.all(uploadPromise);
         const payload = {
             ...req.body,
             ...req.body.password && { password: bcrypt.hashSync(req.body.password, 8) },
-            ...req.body.photo && !req.body.photo?.includes("https://") && { photo: base64ToFormData(req.body.photo) }
+            ...req.body.photo && { photo: uploadedFiles[0] }
         }
         const onUpdate = await users.update(payload, {
             where: {
