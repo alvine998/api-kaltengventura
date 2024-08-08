@@ -161,7 +161,9 @@ exports.login = async (req, res) => {
         res.status(200).send({ message: "Berhasil login", result: existUsers })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        return
     }
 }
 
@@ -241,7 +243,9 @@ exports.update = async (req, res) => {
         res.status(200).send({ message: "Berhasil ubah data", result: results, update: onUpdate })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        return 
     }
 }
 
@@ -261,6 +265,8 @@ exports.delete = async (req, res) => {
         res.status(200).send({ message: "Berhasil hapus data" })
         return
     } catch (error) {
-        return res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Gagal mendapatkan data admin", error: error })
+        return
     }
 }
