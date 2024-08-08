@@ -80,6 +80,7 @@ exports.create = async (req, res) => {
         if (existUsers) {
             return res.status(404).send({ message: "Akun telah terdaftar!" })
         }
+        let uploadPromise = null;
         if(req.body.photo){
             const buffers = [
                 { label: "photo", data: Buffer.from(req.body.photo.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.photo },
@@ -93,7 +94,7 @@ exports.create = async (req, res) => {
                 return url;
             };
     
-           let uploadPromise = buffers.map(async (file) => {
+           uploadPromise = buffers.map(async (file) => {
                 const { data, label, raw } = file
                 const buffer = Buffer.from(data, 'base64');
                 const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
@@ -178,6 +179,7 @@ exports.update = async (req, res) => {
         if (!result) {
             return res.status(404).send({ message: "Data tidak ditemukan!" })
         }
+        let uploadPromise = null;
         if(req.body.photo){
             const buffers = [
                 { label: "photo", data: Buffer.from(req.body.photo.replace(/^data:image\/\w+;base64,/, ''), 'base64'), raw: req.body.photo },
@@ -191,7 +193,7 @@ exports.update = async (req, res) => {
                 return url;
             };
     
-            let uploadPromise = buffers.map(async (file) => {
+            uploadPromise = buffers.map(async (file) => {
                 const { data, label, raw } = file
                 const buffer = Buffer.from(data, 'base64');
                 const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
