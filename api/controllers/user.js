@@ -93,7 +93,7 @@ exports.create = async (req, res) => {
                 return url;
             };
     
-            uploadPromise = buffers.map(async (file) => {
+           let uploadPromise = buffers.map(async (file) => {
                 const { data, label, raw } = file
                 const buffer = Buffer.from(data, 'base64');
                 const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
@@ -191,7 +191,7 @@ exports.update = async (req, res) => {
                 return url;
             };
     
-            uploadPromise = buffers.map(async (file) => {
+            let uploadPromise = buffers.map(async (file) => {
                 const { data, label, raw } = file
                 const buffer = Buffer.from(data, 'base64');
                 const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
