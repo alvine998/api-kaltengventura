@@ -117,7 +117,7 @@ exports.update = async (req, res) => {
 
         const payloadWithPhoto = {
             ...req.body,
-            ...req.body.photo && { photo: uploadedFiles[0] }
+            photo: uploadedFiles[0]
         }
         const onUpdate = await payments.update(req.body.photo ? payloadWithPhoto : { ...req.body }, {
             where: {
