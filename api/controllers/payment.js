@@ -2,6 +2,7 @@
 const { formatDateToIndonesian, base64ToFormData } = require('../../utils');
 const db = require('../models')
 const payments = db.payments
+const applications = db.applications
 const Op = db.Sequelize.Op
 require('dotenv').config()
 const bucket = require('../../config/firebase')
@@ -18,7 +19,7 @@ exports.list = async (req, res) => {
                 ...req.query.search && {
                     [Op.or]: [
                         { application_contract: { [Op.like]: `%${req.query.search}%` } },
-                        { account_number: { [Op.like]: `%${req.query.search}%` } },
+                        { '$application.user_name$': { [Op.like]: `%${req.query.search}%` } } // Filtering by user_name
                     ]
                 },
                 ...req.query.id && { id: { [Op.eq]: req.query.id } },
@@ -36,7 +37,14 @@ exports.list = async (req, res) => {
                 }
             },
             order: [
-                ['created_on', 'ASC'],
+                ['created_on', 'DESC'],
+            ],
+            include: [
+                { 
+                    model: applications, 
+                    as: "application",
+                    attributes: ['user_id', 'user_name']
+                 }
             ],
             limit: size,
             offset: offset
@@ -51,7 +59,9 @@ exports.list = async (req, res) => {
             code: 200
         })
     } catch (error) {
-        return res.status(500).send({ message: "Server mengalami gangguan!", error: error })
+        console.log(error);
+        res.status(500).send({ message: "Server mengalami gangguan!", error: error })
+        return
     }
 };
 

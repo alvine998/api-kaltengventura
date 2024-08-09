@@ -29,4 +29,8 @@ db.payments = require("./payments.js")(sequelize, Sequelize);
 db.images = require("./images.js")(sequelize, Sequelize);
 // db.categories = require("./categories.js")(sequelize, Sequelize);
 
+db.applications.hasMany(db.payments, { foreignKey: 'application_id' });
+db.payments.belongsTo(db.applications, { foreignKey: 'application_id' });
+
+
 module.exports = db;
