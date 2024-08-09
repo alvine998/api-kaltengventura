@@ -111,21 +111,27 @@ exports.update = async (req, res) => {
 
                 return await getDownloadUrl(storageFile)
             })
-        }
+            const uploadedFiles = await Promise.all(uploadPromise);
 
-        const uploadedFiles = await Promise.all(uploadPromise);
-
-        const payloadWithPhoto = {
-            ...req.body,
-            photo: uploadedFiles[0]
-        }
-        const onUpdate = await payments.update(req.body.photo ? payloadWithPhoto : { ...req.body }, {
-            where: {
-                deleted: { [Op.eq]: 0 },
-                id: { [Op.eq]: req.body.id }
+            const payloadWithPhoto = {
+                ...req.body,
+                photo: uploadedFiles[0]
             }
-        })
-        res.status(200).send({ message: "Berhasil ubah data", update: onUpdate })
+            const onUpdate = await payments.update(payloadWithPhoto, {
+                where: {
+                    deleted: { [Op.eq]: 0 },
+                    id: { [Op.eq]: req.body.id }
+                }
+            })
+        } else {
+            const onUpdate = await payments.update({ ...req.body }, {
+                where: {
+                    deleted: { [Op.eq]: 0 },
+                    id: { [Op.eq]: req.body.id }
+                }
+            })
+        }
+        res.status(200).send({ message: "Berhasil ubah data" })
         return
     } catch (error) {
         console.log(error);
