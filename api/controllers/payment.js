@@ -37,7 +37,7 @@ exports.list = async (req, res) => {
                 }
             },
             order: [
-                ['created_on', 'DESC'],
+                ['created_on', 'ASC'],
             ],
             include: [
                 { 
