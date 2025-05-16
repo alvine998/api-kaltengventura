@@ -223,7 +223,8 @@ exports.update = async (req, res) => {
           ),
           raw: req.body.kk,
         },
-      ].filter((v) => v.raw !== "https");
+      ].filter((v) => !v.raw.includes("https"));
+
 
       const uploadToGCS = async ({ data, label, raw }) => {
         const extension = raw.startsWith("data:image/png")
