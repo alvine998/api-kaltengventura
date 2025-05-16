@@ -225,7 +225,6 @@ exports.update = async (req, res) => {
         },
       ].filter((v) => !v.raw.includes("https"));
 
-
       const uploadToGCS = async ({ data, label, raw }) => {
         const extension = raw.startsWith("data:image/png")
           ? "png"
@@ -269,12 +268,20 @@ exports.update = async (req, res) => {
 
       const payload = {
         ...req.body,
-        ...(req.body.ktp && { ktp: uploadedFiles[0] }),
+        ...(req.body.ktp && {
+          ktp: req.body.ktp
+            ? uploadedFiles.find((v) => v.raw === req.body.ktp)
+            : req.body.ktp,
+        }),
         ...(req.body.partner_ktp && {
-          partner_ktp: req.body.partner_ktp ? uploadedFiles[1] : null,
+          partner_ktp: req.body.partner_ktp
+            ? uploadedFiles.find((v) => v.raw === req.body.partner_ktp)
+            : req.body.partner_ktp,
         }),
         ...(req.body.kk && {
-          kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1],
+          kk: req.body.partner_ktp
+            ? uploadedFiles.find((v) => v.raw === req.body.kk)
+            : req.body.kk,
         }),
       };
       const onUpdate = await debtors.update(payload, {
