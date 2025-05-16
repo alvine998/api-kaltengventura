@@ -95,7 +95,7 @@ exports.update = async (req, res) => {
             uploadPromise = buffers.map(async (file) => {
                 const { data, label, raw } = file
                 const buffer = Buffer.from(data, 'base64');
-                const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
+                const storageFile = bucket.file(`uploads/${label}-${req.body.id}`);
 
 
                 new Promise((resolve, reject) => {
