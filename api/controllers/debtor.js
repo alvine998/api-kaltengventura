@@ -231,7 +231,7 @@ exports.update = async (req, res) => {
           : raw.startsWith("data:image/jpeg") ||
             raw.startsWith("data:image/jpg")
           ? "jpg"
-          : "jpeg";
+          : "svg";
 
         const fileName = `uploads/${label}-${req.body.name}.${extension}`;
         const storageFile = bucket.file(fileName);
@@ -265,23 +265,19 @@ exports.update = async (req, res) => {
       };
 
       const uploadedFiles = await Promise.all(buffers.map(uploadToGCS));
+      const findUrlByLabel = (label) =>
+        uploadedFiles.find((v) => v.label === label)?.url;
 
       const payload = {
         ...req.body,
         ...(req.body.ktp && {
-          ktp: req.body.ktp
-            ? uploadedFiles.find((v) => v.raw === req.body.ktp)
-            : req.body.ktp,
+          ktp: findUrlByLabel("ktp"),
         }),
         ...(req.body.partner_ktp && {
-          partner_ktp: req.body.partner_ktp
-            ? uploadedFiles.find((v) => v.raw === req.body.partner_ktp)
-            : req.body.partner_ktp,
+          partner_ktp: findUrlByLabel("partnerktp"),
         }),
         ...(req.body.kk && {
-          kk: req.body.partner_ktp
-            ? uploadedFiles.find((v) => v.raw === req.body.kk)
-            : req.body.kk,
+          kk: findUrlByLabel("kk"),
         }),
       };
       const onUpdate = await debtors.update(payload, {
