@@ -1,7 +1,7 @@
 const db = require("../models");
 const debtors = db.debtors;
 const Op = db.Sequelize.Op;
-const bucket = require("../../config/firebase");
+const { uploadFileToR2 } = require("../../utils/uploadR2");
 require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
@@ -54,7 +54,7 @@ exports.uploadImage = async (req, res) => {
       "..",
       "..",
       "resources",
-      "uploads"
+      "uploads",
     );
     const filePath = path.join(uploadDirectory, fileName);
     console.log(uploadDirectory);
@@ -95,7 +95,7 @@ exports.create = async (req, res) => {
         label: "ktp",
         data: Buffer.from(
           req.body.ktp.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
+          "base64",
         ),
         raw: req.body.ktp,
       },
@@ -103,7 +103,7 @@ exports.create = async (req, res) => {
         label: "partnerktp",
         data: Buffer.from(
           req.body.partner_ktp.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
+          "base64",
         ),
         raw: req.body.partner_ktp,
       },
@@ -111,51 +111,31 @@ exports.create = async (req, res) => {
         label: "kk",
         data: Buffer.from(
           req.body.kk.replace(/^data:image\/\w+;base64,/, ""),
-          "base64"
+          "base64",
         ),
         raw: req.body.kk,
       },
     ].filter((v) => v !== "undefined");
 
-    const getDownloadUrl = async (file) => {
-      const [url] = await file.getSignedUrl({
-        action: "read",
-        expires: "03-01-2500", // Set expiration date as needed
-      });
-      return url;
-    };
-
     const uploadPromise = buffers.map(async (file) => {
       const { data, label, raw } = file;
       const buffer = Buffer.from(data, "base64");
-      const storageFile = bucket.file(`uploads/${label}-${req.body.name}`);
 
-      new Promise((resolve, reject) => {
-        const stream = storageFile.createWriteStream({
-          metadata: {
-            contentType: raw.startsWith("data:image/png")
-              ? "image/png"
-              : raw.startsWith("data:image/png")
-              ? "image/jpg"
-              : "image/jpeg", // Adjust according to your file type
-          },
-        });
+      const extension = raw.startsWith("data:image/png")
+        ? "png"
+        : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
+          ? "jpg"
+          : "jpeg";
 
-        stream.on("error", (err) => {
-          console.error(err);
-          reject("File upload failed.");
-        });
+      const contentType = raw.startsWith("data:image/png")
+        ? "image/png"
+        : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
+          ? "image/jpeg"
+          : "image/jpeg";
 
-        stream.on("finish", async () => {
-          await storageFile.makePublic();
-          const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
-          resolve(publicUrl);
-        });
+      const fileName = `uploads/${label}-${req.body.name}.${extension}`;
 
-        stream.end(buffer);
-      });
-
-      return await getDownloadUrl(storageFile);
+      return await uploadFileToR2(buffer, fileName, contentType);
     });
 
     const uploadedFiles = await Promise.all(uploadPromise);
@@ -203,7 +183,7 @@ exports.update = async (req, res) => {
           label: "ktp",
           data: Buffer.from(
             req.body.ktp.replace(/^data:image\/\w+;base64,/, ""),
-            "base64"
+            "base64",
           ),
           raw: req.body.ktp,
         },
@@ -211,7 +191,7 @@ exports.update = async (req, res) => {
           label: "partnerktp",
           data: Buffer.from(
             req.body.partner_ktp.replace(/^data:image\/\w+;base64,/, ""),
-            "base64"
+            "base64",
           ),
           raw: req.body.partner_ktp,
         },
@@ -219,52 +199,34 @@ exports.update = async (req, res) => {
           label: "kk",
           data: Buffer.from(
             req.body.kk.replace(/^data:image\/\w+;base64,/, ""),
-            "base64"
+            "base64",
           ),
           raw: req.body.kk,
         },
       ].filter((v) => !v.raw.includes("https"));
 
-      const uploadToGCS = async ({ data, label, raw }) => {
+      const uploadToR2 = async ({ data, label, raw }) => {
         const extension = raw.startsWith("data:image/png")
           ? "png"
           : raw.startsWith("data:image/jpeg") ||
-            raw.startsWith("data:image/jpg")
-          ? "jpg"
-          : "svg";
+              raw.startsWith("data:image/jpg")
+            ? "jpg"
+            : "svg";
+
+        const contentType = raw.startsWith("data:image/png")
+          ? "image/png"
+          : raw.startsWith("data:image/jpeg") ||
+              raw.startsWith("data:image/jpg")
+            ? "image/jpeg"
+            : "image/svg+xml";
 
         const fileName = `uploads/${label}-${req.body.name}.${extension}`;
-        const storageFile = bucket.file(fileName);
 
-        return new Promise((resolve, reject) => {
-          const stream = storageFile.createWriteStream({
-            metadata: {
-              contentType: `image/${extension}`,
-            },
-            resumable: false,
-          });
-
-          stream.on("error", (err) => {
-            console.error("Upload error:", err);
-            reject(err);
-          });
-
-          stream.on("finish", async () => {
-            try {
-              await storageFile.makePublic();
-              const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
-              resolve(publicUrl);
-            } catch (err) {
-              console.error("makePublic error:", err);
-              reject(err);
-            }
-          });
-
-          stream.end(data);
-        });
+        const url = await uploadFileToR2(data, fileName, contentType);
+        return { label, url };
       };
 
-      const uploadedFiles = await Promise.all(buffers.map(uploadToGCS));
+      const uploadedFiles = await Promise.all(buffers.map(uploadToR2));
       const findUrlByLabel = (label) =>
         uploadedFiles.find((v) => v.label === label)?.url;
 

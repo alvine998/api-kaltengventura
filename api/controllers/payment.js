@@ -4,7 +4,7 @@ const payments = db.payments;
 const applications = db.applications;
 const Op = db.Sequelize.Op;
 require("dotenv").config();
-const bucket = require("../../config/firebase");
+const { uploadFileToR2 } = require("../../utils/uploadR2");
 
 // Retrieve and return all notes from the database.
 exports.list = async (req, res) => {
@@ -93,52 +93,32 @@ exports.update = async (req, res) => {
           label: "photo",
           data: Buffer.from(
             req.body.photo.replace(/^data:image\/\w+;base64,/, ""),
-            "base64"
+            "base64",
           ),
           raw: req.body.photo,
         },
       ];
 
-      const uploadToGCS = async ({ data, label, raw }) => {
+      const uploadToR2 = async ({ data, label, raw }) => {
         const extension = raw.startsWith("data:image/png")
           ? "png"
           : raw.startsWith("data:image/jpeg") ||
-            raw.startsWith("data:image/jpg")
-          ? "jpg"
-          : "jpeg";
+              raw.startsWith("data:image/jpg")
+            ? "jpg"
+            : "jpeg";
+
+        const contentType = raw.startsWith("data:image/png")
+          ? "image/png"
+          : raw.startsWith("data:image/jpeg") ||
+              raw.startsWith("data:image/jpg")
+            ? "image/jpeg"
+            : "image/jpeg";
 
         const fileName = `uploads/${label}-${req.body.id}.${extension}`;
-        const storageFile = bucket.file(fileName);
-
-        return new Promise((resolve, reject) => {
-          const stream = storageFile.createWriteStream({
-            metadata: {
-              contentType: `image/${extension}`,
-            },
-            resumable: false,
-          });
-
-          stream.on("error", (err) => {
-            console.error("Upload error:", err);
-            reject(err);
-          });
-
-          stream.on("finish", async () => {
-            try {
-              await storageFile.makePublic();
-              const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFile.name}`;
-              resolve(publicUrl);
-            } catch (err) {
-              console.error("makePublic error:", err);
-              reject(err);
-            }
-          });
-
-          stream.end(data);
-        });
+        return await uploadFileToR2(data, fileName, contentType);
       };
 
-      const uploadedFiles = await Promise.all(buffers.map(uploadToGCS));
+      const uploadedFiles = await Promise.all(buffers.map(uploadToR2));
 
       const payloadWithPhoto = {
         ...req.body,
@@ -158,7 +138,7 @@ exports.update = async (req, res) => {
             deleted: { [Op.eq]: 0 },
             id: { [Op.eq]: req.body.id },
           },
-        }
+        },
       );
     }
     res.status(200).send({ message: "Berhasil ubah data" });

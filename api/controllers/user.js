@@ -2,7 +2,6 @@ const db = require("../models");
 const users = db.users;
 const Op = db.Sequelize.Op;
 const bcrypt = require("bcryptjs");
-const bucket = require("../../config/firebase");
 const { base64ToFormData } = require("../../utils");
 const { response } = require("express");
 require("dotenv").config();
@@ -116,7 +115,7 @@ exports.login = async (req, res) => {
     }
     const comparePassword = await bcrypt.compare(
       req.body.password,
-      existUsers.password
+      existUsers.password,
     );
     if (!comparePassword) {
       return res.status(404).send({ message: "Password Salah" });
