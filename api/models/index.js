@@ -12,8 +12,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
     acquire: dbConfig.pool.acquire,
-    idle: dbConfig.pool.idle
-  }
+    idle: dbConfig.pool.idle,
+  },
 });
 
 const db = {};
@@ -27,10 +27,13 @@ db.banks = require("./banks.js")(sequelize, Sequelize);
 db.debtors = require("./debtors.js")(sequelize, Sequelize);
 db.payments = require("./payments.js")(sequelize, Sequelize);
 db.images = require("./images.js")(sequelize, Sequelize);
+db.notifications = require("./notifications.js")(sequelize, Sequelize);
 // db.categories = require("./categories.js")(sequelize, Sequelize);
 
-db.applications.hasMany(db.payments, { foreignKey: 'application_id' });
-db.payments.belongsTo(db.applications, { foreignKey: 'application_id' });
+db.applications.hasMany(db.payments, { foreignKey: "application_id" });
+db.payments.belongsTo(db.applications, { foreignKey: "application_id" });
 
+db.users.hasMany(db.notifications, { foreignKey: "user_id" });
+db.notifications.belongsTo(db.users, { foreignKey: "user_id" });
 
 module.exports = db;

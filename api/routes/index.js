@@ -8,6 +8,7 @@ module.exports = (app) => {
   const cApplication = require("../controllers/application.js");
   const cUpload = require("../controllers/upload.js");
   const cPayment = require("../controllers/payment.js");
+  const cNotification = require("../controllers/notification.js");
 
   /**
    * @swagger
@@ -660,4 +661,117 @@ module.exports = (app) => {
    *         description: Server Error
    */
   app.post("/image/upload", uploadFile.single("file"), cUpload.uploadFiles);
+
+  /**
+   * @swagger
+   * /notification/list:
+   *   get:
+   *     summary: Retrieve a list of notifications
+   *     tags: [Notification]
+   *     parameters:
+   *       - in: query
+   *         name: page
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: size
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: user_id
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: is_read
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: search
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: A list of notifications
+   */
+  app.get("/notification/list", middlewareHere, cNotification.list);
+
+  /**
+   * @swagger
+   * /notification:
+   *   post:
+   *     summary: Create a new notification
+   *     tags: [Notification]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - user_id
+   *               - title
+   *               - message
+   *             properties:
+   *               user_id:
+   *                 type: integer
+   *               title:
+   *                 type: string
+   *               message:
+   *                 type: string
+   *               type:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Notification created successfully
+   */
+  app.post("/notification", middlewareHere, cNotification.create);
+
+  /**
+   * @swagger
+   * /notification:
+   *   patch:
+   *     summary: Update a notification
+   *     tags: [Notification]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - id
+   *             properties:
+   *               id:
+   *                 type: integer
+   *               title:
+   *                 type: string
+   *               message:
+   *                 type: string
+   *               is_read:
+   *                 type: integer
+   *               type:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Notification updated successfully
+   */
+  app.patch("/notification", middlewareHere, cNotification.update);
+
+  /**
+   * @swagger
+   * /notification:
+   *   delete:
+   *     summary: Delete a notification
+   *     tags: [Notification]
+   *     parameters:
+   *       - in: query
+   *         name: id
+   *         schema:
+   *           type: integer
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Notification deleted successfully
+   */
+  app.delete("/notification", middlewareHere, cNotification.delete);
 };
