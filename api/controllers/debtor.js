@@ -90,65 +90,65 @@ exports.create = async (req, res) => {
         });
       }
     }
-    const buffers = [
-      {
-        label: "ktp",
-        data: Buffer.from(
-          req.body.ktp.replace(/^data:image\/\w+;base64,/, ""),
-          "base64",
-        ),
-        raw: req.body.ktp,
-      },
-      req.body.partner_ktp && {
-        label: "partnerktp",
-        data: Buffer.from(
-          req.body.partner_ktp.replace(/^data:image\/\w+;base64,/, ""),
-          "base64",
-        ),
-        raw: req.body.partner_ktp,
-      },
-      {
-        label: "kk",
-        data: Buffer.from(
-          req.body.kk.replace(/^data:image\/\w+;base64,/, ""),
-          "base64",
-        ),
-        raw: req.body.kk,
-      },
-    ].filter((v) => v !== "undefined");
+    // const buffers = [
+    //   {
+    //     label: "ktp",
+    //     data: Buffer.from(
+    //       req.body.ktp.replace(/^data:image\/\w+;base64,/, ""),
+    //       "base64",
+    //     ),
+    //     raw: req.body.ktp,
+    //   },
+    //   req.body.partner_ktp && {
+    //     label: "partnerktp",
+    //     data: Buffer.from(
+    //       req.body.partner_ktp.replace(/^data:image\/\w+;base64,/, ""),
+    //       "base64",
+    //     ),
+    //     raw: req.body.partner_ktp,
+    //   },
+    //   {
+    //     label: "kk",
+    //     data: Buffer.from(
+    //       req.body.kk.replace(/^data:image\/\w+;base64,/, ""),
+    //       "base64",
+    //     ),
+    //     raw: req.body.kk,
+    //   },
+    // ].filter((v) => v !== "undefined");
 
-    const uploadPromise = buffers.map(async (file) => {
-      const { data, label, raw } = file;
-      const buffer = Buffer.from(data, "base64");
+    // const uploadPromise = buffers.map(async (file) => {
+    //   const { data, label, raw } = file;
+    //   const buffer = Buffer.from(data, "base64");
 
-      const extension = raw.startsWith("data:image/png")
-        ? "png"
-        : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
-          ? "jpg"
-          : "jpeg";
+    //   const extension = raw.startsWith("data:image/png")
+    //     ? "png"
+    //     : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
+    //       ? "jpg"
+    //       : "jpeg";
 
-      const contentType = raw.startsWith("data:image/png")
-        ? "image/png"
-        : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
-          ? "image/jpeg"
-          : "image/jpeg";
+    //   const contentType = raw.startsWith("data:image/png")
+    //     ? "image/png"
+    //     : raw.startsWith("data:image/jpeg") || raw.startsWith("data:image/jpg")
+    //       ? "image/jpeg"
+    //       : "image/jpeg";
 
-      const fileName = `uploads/${label}-${req.body.name}.${extension}`;
+    //   const fileName = `uploads/${label}-${req.body.name}.${extension}`;
 
-      return await uploadFileToR2(buffer, fileName, contentType);
-    });
+    //   return await uploadFileToR2(buffer, fileName, contentType);
+    // });
 
-    const uploadedFiles = await Promise.all(uploadPromise);
+    // const uploadedFiles = await Promise.all(uploadPromise);
 
     const payload = {
       ...req.body,
-      ...(req.body.ktp && { ktp: uploadedFiles[0] }),
-      ...(req.body.partner_ktp && {
-        partner_ktp: req.body.partner_ktp ? uploadedFiles[1] : null,
-      }),
-      ...(req.body.kk && {
-        kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1],
-      }),
+      // ...(req.body.ktp && { ktp: uploadedFiles[0] }),
+      // ...(req.body.partner_ktp && {
+      //   partner_ktp: req.body.partner_ktp ? uploadedFiles[1] : null,
+      // }),
+      // ...(req.body.kk && {
+      //   kk: req.body.partner_ktp ? uploadedFiles[2] : uploadedFiles[1],
+      // }),
     };
     const result = await debtors.create(payload);
     return res.status(200).send({
