@@ -465,7 +465,7 @@ module.exports = (app) => {
    *                 type: integer
    *               user_from:
    *                 type: string
-   *                 description: 'admin' to auto-generate payments
+   *                 description: admin to auto-generate payments
    *               start_date:
    *                 type: string
    *                 format: date
@@ -476,6 +476,39 @@ module.exports = (app) => {
    *         description: Application created successfully
    *       400:
    *         description: Missing parameters or user not found
+   *   patch:
+   *     summary: Update an application
+   *     tags: [Application]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - id
+   *             properties:
+   *               id:
+   *                 type: integer
+   *     responses:
+   *       200:
+   *         description: Application updated successfully
+   *       404:
+   *         description: Application not found
+   *   delete:
+   *     summary: Delete an application (soft delete)
+   *     tags: [Application]
+   *     parameters:
+   *       - in: query
+   *         name: id
+   *         schema:
+   *           type: integer
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Application deleted successfully
+   *       404:
+   *         description: Application not found
    */
   app.post("/application", middlewareHere, cApplication.create);
 
@@ -515,49 +548,8 @@ module.exports = (app) => {
    */
   app.post("/application/approval", middlewareHere, cApplication.approval);
 
-  /**
-   * @swagger
-   * /application:
-   *   patch:
-   *     summary: Update an application
-   *     tags: [Application]
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             required:
-   *               - id
-   *             properties:
-   *               id:
-   *                 type: integer
-   *     responses:
-   *       200:
-   *         description: Application updated successfully
-   *       404:
-   *         description: Application not found
-   */
   app.patch("/application", middlewareHere, cApplication.update);
 
-  /**
-   * @swagger
-   * /application:
-   *   delete:
-   *     summary: Delete an application (soft delete)
-   *     tags: [Application]
-   *     parameters:
-   *       - in: query
-   *         name: id
-   *         schema:
-   *           type: integer
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Application deleted successfully
-   *       404:
-   *         description: Application not found
-   */
   app.delete("/application", middlewareHere, cApplication.delete);
 
   /**
