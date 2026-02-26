@@ -2,6 +2,7 @@ const { formatDateToIndonesian, base64ToFormData } = require("../../utils");
 const db = require("../models");
 const payments = db.payments;
 const applications = db.applications;
+const notifications = db.notifications;
 const Op = db.Sequelize.Op;
 require("dotenv").config();
 const { uploadFileToR2 } = require("../../utils/uploadR2");
@@ -141,6 +142,37 @@ exports.update = async (req, res) => {
         },
       );
     }
+
+    // Send in-app notification to the user
+    const updatedPayment = await payments.findOne({
+      where: { id: req.body.id },
+      include: [
+        {
+          model: applications,
+          as: "application",
+          attributes: ["user_id", "user_name"],
+        },
+      ],
+    });
+
+    if (updatedPayment && updatedPayment.application) {
+      const statusLabel =
+        req.body.status === "paid"
+          ? "Disetujui"
+          : req.body.status === "pending"
+            ? "Menunggu Verifikasi"
+            : "Ditolak";
+
+      await notifications.create({
+        user_id: updatedPayment.application.user_id,
+        title: "Update Pembayaran",
+        message: `Pembayaran angsuran ke-${updatedPayment.payment_no} ${statusLabel}.`,
+        type: "payment",
+        is_read: 0,
+        deleted: 0,
+      });
+    }
+
     res.status(200).send({ message: "Berhasil ubah data" });
     return;
   } catch (error) {
