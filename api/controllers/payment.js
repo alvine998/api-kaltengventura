@@ -85,44 +85,44 @@ exports.update = async (req, res) => {
       return res.status(404).send({ message: "Data tidak ditemukan!" });
     }
 
-    let uploadPromise = null;
+    // let uploadPromise = null;
 
     if (req.body.photo) {
-      const buffers = [
-        {
-          label: "photo",
-          data: Buffer.from(
-            req.body.photo.replace(/^data:image\/\w+;base64,/, ""),
-            "base64",
-          ),
-          raw: req.body.photo,
-        },
-      ];
+      // const buffers = [
+      //   {
+      //     label: "photo",
+      //     data: Buffer.from(
+      //       req.body.photo.replace(/^data:image\/\w+;base64,/, ""),
+      //       "base64",
+      //     ),
+      //     raw: req.body.photo,
+      //   },
+      // ];
 
-      const uploadToR2 = async ({ data, label, raw }) => {
-        const extension = raw.startsWith("data:image/png")
-          ? "png"
-          : raw.startsWith("data:image/jpeg") ||
-              raw.startsWith("data:image/jpg")
-            ? "jpg"
-            : "jpeg";
+      // const uploadToR2 = async ({ data, label, raw }) => {
+      //   const extension = raw.startsWith("data:image/png")
+      //     ? "png"
+      //     : raw.startsWith("data:image/jpeg") ||
+      //         raw.startsWith("data:image/jpg")
+      //       ? "jpg"
+      //       : "jpeg";
 
-        const contentType = raw.startsWith("data:image/png")
-          ? "image/png"
-          : raw.startsWith("data:image/jpeg") ||
-              raw.startsWith("data:image/jpg")
-            ? "image/jpeg"
-            : "image/jpeg";
+      //   const contentType = raw.startsWith("data:image/png")
+      //     ? "image/png"
+      //     : raw.startsWith("data:image/jpeg") ||
+      //         raw.startsWith("data:image/jpg")
+      //       ? "image/jpeg"
+      //       : "image/jpeg";
 
-        const fileName = `uploads/${label}-${req.body.id}.${extension}`;
-        return await uploadFileToR2(data, fileName, contentType);
-      };
+      //   const fileName = `uploads/${label}-${req.body.id}.${extension}`;
+      //   return await uploadFileToR2(data, fileName, contentType);
+      // };
 
-      const uploadedFiles = await Promise.all(buffers.map(uploadToR2));
+      // const uploadedFiles = await Promise.all(buffers.map(uploadToR2));
 
       const payloadWithPhoto = {
         ...req.body,
-        photo: uploadedFiles[0],
+        // photo: uploadedFiles[0],
       };
       await payments.update(payloadWithPhoto, {
         where: {
