@@ -3,7 +3,6 @@ const users = db.users;
 const Op = db.Sequelize.Op;
 const bcrypt = require("bcryptjs");
 const { base64ToFormData } = require("../../utils");
-const { response } = require("express");
 require("dotenv").config();
 
 // Retrieve and return all notes from the database.
@@ -46,10 +45,12 @@ exports.list = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ message: "Server mengalami gangguan!", error: error });
-    return;
+    return res.status(500).send({
+      status: "error",
+      message: "Server mengalami gangguan!",
+      error: error,
+      code: 500,
+    });
   }
 };
 
@@ -62,8 +63,7 @@ exports.create = async (req, res) => {
       if (!req.body[element]) {
         return res.status(400).send({
           status: "error",
-          items: "",
-          error_message: "Parameter tidak lengkap! " + element,
+          message: "Parameter tidak lengkap! " + element,
           code: 400,
         });
       }
@@ -82,7 +82,11 @@ exports.create = async (req, res) => {
       },
     });
     if (existUsers) {
-      return res.status(404).send({ message: "Akun telah terdaftar!" });
+      return res.status(400).send({
+        status: "error",
+        message: "Akun telah terdaftar!",
+        code: 400,
+      });
     }
 
     const payload = {
@@ -97,10 +101,12 @@ exports.create = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ message: "Server mengalami gangguan!", error: error });
-    return;
+    return res.status(500).send({
+      status: "error",
+      message: "Server mengalami gangguan!",
+      error: error,
+      code: 500,
+    });
   }
 };
 
@@ -113,30 +119,44 @@ exports.login = async (req, res) => {
       },
     });
     if (!existUsers) {
-      return res.status(404).send({ message: "Email tidak ditemukan!" });
+      return res.status(404).send({
+        status: "error",
+        message: "Email tidak ditemukan!",
+        code: 404,
+      });
     }
     const comparePassword = await bcrypt.compare(
       req.body.password,
       existUsers.password,
     );
     if (!comparePassword) {
-      return res.status(404).send({ message: "Password Salah" });
+      return res.status(404).send({
+        status: "error",
+        message: "Password Salah",
+        code: 404,
+      });
     }
-    const response = {
+    const userData = {
       id: existUsers.id,
       name: existUsers.name,
       email: existUsers.email,
       phone: existUsers.phone,
       status: existUsers.status,
     };
-    res.status(200).send({ message: "Berhasil login", result: response });
-    return;
+    return res.status(200).send({
+      status: "success",
+      message: "Berhasil login",
+      items: userData,
+      code: 200,
+    });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ message: "Gagal mendapatkan data admin", error: error });
-    return;
+    return res.status(500).send({
+      status: "error",
+      message: "Gagal login",
+      error: error,
+      code: 500,
+    });
   }
 };
 
@@ -149,7 +169,11 @@ exports.update = async (req, res) => {
       },
     });
     if (!result) {
-      return res.status(404).send({ message: "Data tidak ditemukan!" });
+      return res.status(404).send({
+        status: "error",
+        message: "Data tidak ditemukan!",
+        code: 404,
+      });
     }
 
     const payload = {
@@ -171,18 +195,21 @@ exports.update = async (req, res) => {
         id: { [Op.eq]: req.body.id },
       },
     });
-    res.status(200).send({
+    return res.status(200).send({
+      status: "success",
       message: "Berhasil ubah data",
-      result: results,
+      items: results,
       update: onUpdate,
+      code: 200,
     });
-    return;
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ message: "Gagal mendapatkan data admin", error: error });
-    return;
+    return res.status(500).send({
+      status: "error",
+      message: "Gagal mengubah data",
+      error: error,
+      code: 500,
+    });
   }
 };
 
@@ -195,17 +222,26 @@ exports.delete = async (req, res) => {
       },
     });
     if (!result) {
-      return res.status(404).send({ message: "Data tidak ditemukan!" });
+      return res.status(404).send({
+        status: "error",
+        message: "Data tidak ditemukan!",
+        code: 404,
+      });
     }
     result.deleted = 1;
     await result.save();
-    res.status(200).send({ message: "Berhasil hapus data" });
-    return;
+    return res.status(200).send({
+      status: "success",
+      message: "Berhasil hapus data",
+      code: 200,
+    });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({ message: "Gagal mendapatkan data admin", error: error });
-    return;
+    return res.status(500).send({
+      status: "error",
+      message: "Gagal menghapus data",
+      error: error,
+      code: 500,
+    });
   }
 };
