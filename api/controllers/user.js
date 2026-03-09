@@ -57,6 +57,7 @@ exports.list = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const { phone } = req.body;
+    if (req.body.email) req.body.email = req.body.email.toLowerCase();
     let requiredAttributes = ["name", "phone", "email", "status", "password"];
     for (let index = 0; index < requiredAttributes.length; index++) {
       const element = requiredAttributes[index];
@@ -112,6 +113,7 @@ exports.create = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
+    if (req.body.email) req.body.email = req.body.email.toLowerCase();
     const existUsers = await users.findOne({
       where: {
         deleted: { [Op.eq]: 0 },
@@ -162,6 +164,7 @@ exports.login = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
+    if (req.body.email) req.body.email = req.body.email.toLowerCase();
     const result = await users.findOne({
       where: {
         deleted: { [Op.eq]: 0 },
